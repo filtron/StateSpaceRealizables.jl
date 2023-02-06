@@ -16,6 +16,3 @@ for func in (:(==), :isequal, :isapprox),
         return true
     end
 end
-
-
-

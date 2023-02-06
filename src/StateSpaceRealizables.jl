@@ -29,9 +29,15 @@ export StateSpaceRealizable,
     impulse_response!
 
 include("inner_functions.jl")
-export AbstractInnerFunction, UnivariateInnerFunction, LaguerreInner, KautzInner, CompositeInner, CompositeLaguerreInner, CompositeKautzInner, butter_inner, shift_basis!, shift_basis!
-
-
-
+export AbstractInnerFunction,
+    UnivariateInnerFunction,
+    LaguerreInner,
+    KautzInner,
+    CompositeInner,
+    CompositeLaguerreInner,
+    CompositeKautzInner,
+    butter_inner,
+    shift_basis!,
+    shift_basis!
 
 end

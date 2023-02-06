@@ -25,7 +25,9 @@ struct LaguerreInner{E,T} <: UnivariateInnerFunction{E,T}
     λ::T
 end
 
-LaguerreInner{E}(λ::Real) where {E<:ContinuousTE} = λ > zero(λ) ? LaguerreInner{E,typeof(λ)}(λ) : throw(DomainError(λ, "λ must be positive."))
+LaguerreInner{E}(λ::Real) where {E<:ContinuousTE} =
+    λ > zero(λ) ? LaguerreInner{E,typeof(λ)}(λ) :
+    throw(DomainError(λ, "λ must be positive."))
 
 LaguerreInner(λ; te::TimeEvolution = ContinuousTE()) = LaguerreInner{typeof(te)}(λ)
 
@@ -78,7 +80,8 @@ CompositeInner(Ls::AbstractVector{<:LaguerreInner{E,T}}) where {E,T} =
 CompositeInner(Ks::AbstractVector{KautzInner{E,T}}) where {E,T} =
     CompositeInner{E,T,Nothing,typeof(Ks)}(nothing, Ks)
 
-CompositeInner(L::LaguerreInner{E,T}, K::KautzInner{E,T}) where {E,T} = CompositeInner([L], [K])
+CompositeInner(L::LaguerreInner{E,T}, K::KautzInner{E,T}) where {E,T} =
+    CompositeInner([L], [K])
 
 CompositeInner(L::LaguerreInner{T}) where {T} = CompositeInner([L])
 CompositeInner(K::KautzInner{T}) where {T} = CompositeInner([K])
@@ -180,7 +183,8 @@ ssrealize(C::CompositeInner) =
     reduce(∘, ssrealize.(C.kautz_inners)) ∘ reduce(∘, ssrealize.(C.laguerre_inners)) # can be made more efficient by pre-allocation and for loop?
 
 
-∘(H2::UnivariateInnerFunction{E,T}, H1::UnivariateInnerFunction{E,T}) where {E,T} = ∘(CompositeInner(H2), CompositeInner(H1)) # fallback
+∘(H2::UnivariateInnerFunction{E,T}, H1::UnivariateInnerFunction{E,T}) where {E,T} =
+    ∘(CompositeInner(H2), CompositeInner(H1)) # fallback
 *(H2::UnivariateInnerFunction{E,T}, H1::UnivariateInnerFunction{E,T}) where {E,T} = H2 ∘ H1
 
 ∘(H2::CompositeInner{E,T}, H1::CompositeInner{E,T}) where {E,T} = CompositeInner(
@@ -188,16 +192,12 @@ ssrealize(C::CompositeInner) =
     vcat(H2.kautz_inners, H1.kautz_inners),
 )
 
-∘(H2::CompositeInner{E,T}, H1::CompositeLaguerreInner{E,T}) where {E,T} = CompositeInner(
-    vcat(H2.laguerre_inners, H1.laguerre_inners),
-    H2.kautz_inners,
-)
+∘(H2::CompositeInner{E,T}, H1::CompositeLaguerreInner{E,T}) where {E,T} =
+    CompositeInner(vcat(H2.laguerre_inners, H1.laguerre_inners), H2.kautz_inners)
 ∘(H2::CompositeLaguerreInner{E,T}, H1::CompositeInner{E,T}) where {E,T} = H1 ∘ H2
 
-∘(H2::CompositeInner{E,T}, H1::CompositeKautzInner{E,T}) where {E,T} = CompositeInner(
-    H2.laguerre_inners,
-    vcat(H2.kautz_inners, H1.kautz_inners),
-)
+∘(H2::CompositeInner{E,T}, H1::CompositeKautzInner{E,T}) where {E,T} =
+    CompositeInner(H2.laguerre_inners, vcat(H2.kautz_inners, H1.kautz_inners))
 ∘(H2::CompositeKautzInner{E,T}, H1::CompositeInner{E,T}) where {E,T} = H1 ∘ H2
 
 
@@ -259,7 +259,3 @@ function shift_basis(H::AbstractInnerFunction, n::Integer, z::Complex)
     shift_basis!(es, H, n, z)
     return es
 end
-
-
-
-

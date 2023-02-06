@@ -110,8 +110,12 @@ end
 abstract type StateSpaceParameterType end
 struct MatrixParameter end
 
-ssparameter_type(::StateSpace{ET,T,<:AbstractMatrix,<:AbstractMatrix,<:AbstractMatrix,<:AbstractMatrix}) where {ET,T} = MatrixParameter()
-ssparameter_type(::ProperStateSpace{ET,T,<:AbstractMatrix,<:AbstractMatrix,<:AbstractMatrix}) where {ET,T} = MatrixParameter()
+ssparameter_type(
+    ::StateSpace{ET,T,<:AbstractMatrix,<:AbstractMatrix,<:AbstractMatrix,<:AbstractMatrix},
+) where {ET,T} = MatrixParameter()
+ssparameter_type(
+    ::ProperStateSpace{ET,T,<:AbstractMatrix,<:AbstractMatrix,<:AbstractMatrix},
+) where {ET,T} = MatrixParameter()
 
 ninputs(s::AbstractStateSpace) = ninputs(s, ssparameter_type(s))
 nstates(s::AbstractStateSpace) = nstates(s, ssparameter_type(s))
@@ -148,14 +152,22 @@ e.g. StateSpace / ProperStateSpace.
 ssrealize(s::StateSpace) = s
 ssrealize(s::ProperStateSpace) = s
 
-ssrealize(A,B,C,D; te::TimeEvolution = ContinuousTE()) = StateSpace{typeof(te)}(A, B, C, D)
-ssrealize(A,B,C; te::TimeEvolution = ContinuousTE()) = ProperStateSpace{typeof(te)}(A, B, C)
+ssrealize(A, B, C, D; te::TimeEvolution = ContinuousTE()) =
+    StateSpace{typeof(te)}(A, B, C, D)
+ssrealize(A, B, C; te::TimeEvolution = ContinuousTE()) =
+    ProperStateSpace{typeof(te)}(A, B, C)
 
 
 
-+(s1::AbstractStateSpace{E,T}, s2::AbstractStateSpace{E,T}) where {E,T} = ssadd(s1, ssparameter_type(s1), s2, ssparameter_type(s2))
++(s1::AbstractStateSpace{E,T}, s2::AbstractStateSpace{E,T}) where {E,T} =
+    ssadd(s1, ssparameter_type(s1), s2, ssparameter_type(s2))
 
-function ssadd(s1::StateSpace{E,T}, ::MatrixParameter, s2::StateSpace{E,T}, ::MatrixParameter) where {E,T}
+function ssadd(
+    s1::StateSpace{E,T},
+    ::MatrixParameter,
+    s2::StateSpace{E,T},
+    ::MatrixParameter,
+) where {E,T}
     A = [s2.A zeros(T, nstates(s2), nstates(s1)); zeros(nstates(s1), nstates(s2)) s1.A]
     B = vcat(s2.B, s1.B)
     C = hcat(s2.C, s1.C)
@@ -163,7 +175,12 @@ function ssadd(s1::StateSpace{E,T}, ::MatrixParameter, s2::StateSpace{E,T}, ::Ma
     return StateSpace{E}(A, B, C, D)
 end
 
-function ssadd(s1::StateSpace{E,T}, ::MatrixParameter, s2::ProperStateSpace{E,T}, ::MatrixParameter) where {E,T}
+function ssadd(
+    s1::StateSpace{E,T},
+    ::MatrixParameter,
+    s2::ProperStateSpace{E,T},
+    ::MatrixParameter,
+) where {E,T}
     A = [s2.A zeros(T, nstates(s2), nstates(s1)); zeros(nstates(s1), nstates(s2)) s1.A]
     B = vcat(s2.B, s1.B)
     C = hcat(s2.C, s1.C)
@@ -171,7 +188,12 @@ function ssadd(s1::StateSpace{E,T}, ::MatrixParameter, s2::ProperStateSpace{E,T}
     return StateSpace{E}(A, B, C, D)
 end
 
-function ssadd(s1::ProperStateSpace{E,T}, ::MatrixParameter, s2::StateSpace{E,T}, ::MatrixParameter) where {E,T}
+function ssadd(
+    s1::ProperStateSpace{E,T},
+    ::MatrixParameter,
+    s2::StateSpace{E,T},
+    ::MatrixParameter,
+) where {E,T}
     A = [s2.A zeros(T, nstates(s2), nstates(s1)); zeros(nstates(s1), nstates(s2)) s1.A]
     B = vcat(s2.B, s1.B)
     C = hcat(s2.C, s1.C)
@@ -179,7 +201,12 @@ function ssadd(s1::ProperStateSpace{E,T}, ::MatrixParameter, s2::StateSpace{E,T}
     return StateSpace{E}(A, B, C, D)
 end
 
-function ssadd(s1::ProperStateSpace{E,T}, ::MatrixParameter, s2::ProperStateSpace{E,T}, ::MatrixParameter) where {E,T}
+function ssadd(
+    s1::ProperStateSpace{E,T},
+    ::MatrixParameter,
+    s2::ProperStateSpace{E,T},
+    ::MatrixParameter,
+) where {E,T}
     A = [s2.A zeros(T, nstates(s2), nstates(s1)); zeros(nstates(s1), nstates(s2)) s1.A]
     B = vcat(s2.B, s1.B)
     C = hcat(s2.C, s1.C)
@@ -190,14 +217,22 @@ end
 -(s::AbstractStateSpace) = ssnegate(s, ssparameter_type(s))
 -(s1::AbstractStateSpace{E,T}, s2::AbstractStateSpace{E,T}) where {E,T} = +(s1, -s2)
 
-ssnegate(s::StateSpace{E}, ::MatrixParameter) where {E} = StateSpace{E}(s.A, s.B, -s.C, -s.D)
-ssnegate(s::ProperStateSpace{E}, ::MatrixParameter) where {E} = ProperStateSpace{E}(s.A, s.B, -s.C)
+ssnegate(s::StateSpace{E}, ::MatrixParameter) where {E} =
+    StateSpace{E}(s.A, s.B, -s.C, -s.D)
+ssnegate(s::ProperStateSpace{E}, ::MatrixParameter) where {E} =
+    ProperStateSpace{E}(s.A, s.B, -s.C)
 
 
-∘(s2::AbstractStateSpace{E,T}, s1::AbstractStateSpace{E,T}) where {E,T} = sscompose(s2, ssparameter_type(s2), s1, ssparameter_type(s1)) # prefer this one
+∘(s2::AbstractStateSpace{E,T}, s1::AbstractStateSpace{E,T}) where {E,T} =
+    sscompose(s2, ssparameter_type(s2), s1, ssparameter_type(s1)) # prefer this one
 *(s2::AbstractStateSpace{E,T}, s1::AbstractStateSpace{E,T}) where {E,T} = ∘(s2, s1)  # keep this one to not break things
 
-function sscompose(s2::StateSpace{E,T}, ::MatrixParameter, s1::StateSpace{E,T}, ::MatrixParameter) where {E,T}
+function sscompose(
+    s2::StateSpace{E,T},
+    ::MatrixParameter,
+    s1::StateSpace{E,T},
+    ::MatrixParameter,
+) where {E,T}
     A = [s1.A zeros(T, nstates(s1), nstates(s2)); s2.B*s1.C s2.A]
     B = vcat(s1.B, s2.B * s1.D)
     C = hcat(s2.D * s1.C, s2.C)
@@ -205,21 +240,36 @@ function sscompose(s2::StateSpace{E,T}, ::MatrixParameter, s1::StateSpace{E,T}, 
     return StateSpace{E}(A, B, C, D)
 end
 
-function sscompose(s2::StateSpace{E,T}, ::MatrixParameter, s1::ProperStateSpace{E,T}, ::MatrixParameter) where {E,T}
+function sscompose(
+    s2::StateSpace{E,T},
+    ::MatrixParameter,
+    s1::ProperStateSpace{E,T},
+    ::MatrixParameter,
+) where {E,T}
     A = [s1.A zeros(T, nstates(s1), nstates(s2)); s2.B*s1.C s2.A]
     B = vcat(s1.B, zeros(T, nstates(s2), ninputs(s1)))
     C = hcat(s2.D * s1.C, s2.C)
     return ProperStateSpace{E}(A, B, C)
 end
 
-function sscompose(s2::ProperStateSpace{E,T}, ::MatrixParameter, s1::StateSpace{E,T}, ::MatrixParameter) where {E,T}
+function sscompose(
+    s2::ProperStateSpace{E,T},
+    ::MatrixParameter,
+    s1::StateSpace{E,T},
+    ::MatrixParameter,
+) where {E,T}
     A = [s1.A zeros(T, nstates(s1), nstates(s2)); s2.B*s1.C s2.A]
     B = vcat(s1.B, s2.B * s1.D)
     C = hcat(zero(s1.C), s2.C)
     return ProperStateSpace{E}(A, B, C)
 end
 
-function sscompose(s2::ProperStateSpace{E,T}, ::MatrixParameter, s1::ProperStateSpace{E,T}, ::MatrixParameter) where {E,T}
+function sscompose(
+    s2::ProperStateSpace{E,T},
+    ::MatrixParameter,
+    s1::ProperStateSpace{E,T},
+    ::MatrixParameter,
+) where {E,T}
     A = [s1.A zeros(T, nstates(s1), nstates(s2)); s2.B*s1.C s2.A]
     B = vcat(s1.B, zeros(T, nstates(s2), ninputs(s2)))
     C = hcat(zeros(T, noutputs(s1), nstates(s1)), s2.C)
@@ -229,9 +279,15 @@ end
 
 
 
-sqr_magnitude_response!(mag2, s::AbstractStateSpace, zs) = _sqr_magnitude_response!(mag2, s, ssparameter_type(s), zs)
+sqr_magnitude_response!(mag2, s::AbstractStateSpace, zs) =
+    _sqr_magnitude_response!(mag2, s, ssparameter_type(s), zs)
 
-function _sqr_magnitude_response!(mag2::AbstractVector{<:AbstractMatrix}, s::StateSpace{<:ContinuousTE}, ::MatrixParameter, zs)
+function _sqr_magnitude_response!(
+    mag2::AbstractVector{<:AbstractMatrix},
+    s::StateSpace{<:ContinuousTE},
+    ::MatrixParameter,
+    zs,
+)
     A, B, C, D = ssparams(s)
     E = complex.(similar(B))
     H = complex.(similar(D))
@@ -243,7 +299,12 @@ function _sqr_magnitude_response!(mag2::AbstractVector{<:AbstractMatrix}, s::Sta
     end
 end
 
-function _sqr_magnitude_response!(mag2::AbstractVector{<:AbstractMatrix}, s::ProperStateSpace{<:ContinuousTE}, ::MatrixParameter, zs)
+function _sqr_magnitude_response!(
+    mag2::AbstractVector{<:AbstractMatrix},
+    s::ProperStateSpace{<:ContinuousTE},
+    ::MatrixParameter,
+    zs,
+)
     A, B, C, D = ssparams(s)
     E = complex.(similar(B))
     H = zeros(eltype(zs), noutputs(s), ninputs(s))
@@ -255,7 +316,8 @@ function _sqr_magnitude_response!(mag2::AbstractVector{<:AbstractMatrix}, s::Pro
     end
 end
 
-sqr_magnitude_response(s::AbstractStateSpace, zs) = _sqr_magnitude_response(s::AbstractStateSpace, ssparameter_type(s), zs)
+sqr_magnitude_response(s::AbstractStateSpace, zs) =
+    _sqr_magnitude_response(s::AbstractStateSpace, ssparameter_type(s), zs)
 
 function _sqr_magnitude_response(s::AbstractStateSpace, ::MatrixParameter, zs)
     n = length(zs)
@@ -266,9 +328,15 @@ function _sqr_magnitude_response(s::AbstractStateSpace, ::MatrixParameter, zs)
 end
 
 
-impulse_response!(hs, s::AbstractStateSpace, ts) = _impulse_response!(hs, s, ssparameter_type(s), ts)
+impulse_response!(hs, s::AbstractStateSpace, ts) =
+    _impulse_response!(hs, s, ssparameter_type(s), ts)
 
-function _impulse_response!(hs::AbstractVector{<:AbstractMatrix}, s::StateSpace{<:ContinuousTE}, ::MatrixParameter, ts)
+function _impulse_response!(
+    hs::AbstractVector{<:AbstractMatrix},
+    s::StateSpace{<:ContinuousTE},
+    ::MatrixParameter,
+    ts,
+)
     A, B, C, D = ssparams(s)
     E = similar(B)
     for (i, t) in enumerate(ts)
@@ -278,7 +346,12 @@ function _impulse_response!(hs::AbstractVector{<:AbstractMatrix}, s::StateSpace{
     end
 end
 
-function _impulse_response!(hs::AbstractVector{<:AbstractMatrix}, s::ProperStateSpace{<:ContinuousTE}, ::MatrixParameter, ts)
+function _impulse_response!(
+    hs::AbstractVector{<:AbstractMatrix},
+    s::ProperStateSpace{<:ContinuousTE},
+    ::MatrixParameter,
+    ts,
+)
     A, B, C, D = ssparams(s)
     E = similar(B)
     for (i, t) in enumerate(ts)
