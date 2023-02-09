@@ -5,7 +5,6 @@ Abstract type for representing inner functions.
 """
 abstract type AbstractInnerFunction{E} <: StateSpaceRealizable{E} end
 
-
 isproper(::AbstractInnerFunction) = false
 
 """
@@ -14,7 +13,6 @@ isproper(::AbstractInnerFunction) = false
 Abstract type for representing inner functions.
 """
 abstract type UnivariateInnerFunction{E,T<:Number} <: AbstractInnerFunction{E} end
-
 
 """
     LaguerreInner{E,T} <: UnivariateInnerFunction{E,T}
@@ -240,7 +238,12 @@ end
 
 Computes the shift basis functions up to order n evaluated at im*ω.
 """
-function shift_basis!(es::AbstractVector, H::AbstractInnerFunction, n::Integer, z::Complex)
+function shift_basis!(
+    es::AbstractVector,
+    H::UnivariateInnerFunction,
+    n::Integer,
+    z::Complex,
+)
 
     (; A, B, C, D) = ssrealize(H)
     B = view(B, :, 1)
@@ -254,8 +257,79 @@ function shift_basis!(es::AbstractVector, H::AbstractInnerFunction, n::Integer, 
     return es
 end
 
-function shift_basis(H::AbstractInnerFunction, n::Integer, z::Complex)
+function shift_basis(H::UnivariateInnerFunction, n::Integer, z::Complex)
     es = zeros(typeof(z), (n + 1) * nstates(H))
     shift_basis!(es, H, n, z)
     return es
+end
+
+
+function shift_basis!(
+    es::AbstractMatrix,
+    H::UnivariateInnerFunction,
+    n::Integer,
+    z::AbstractVector{T},
+) where {T<:Complex}
+    for (i, col) in enumerate(eachcol(es))
+        shift_basis!(col, H, n, z[i])
+    end
+end
+
+function shift_basis(
+    H::UnivariateInnerFunction,
+    n::Integer,
+    z::AbstractVector{T},
+) where {T<:Complex}
+    ncol = length(z)
+    nrow = (n + 1) * nstates(H)
+    es = zeros(T, nrow, ncol)
+    shift_basis!(es, H, n, z)
+    return permutedims(es)
+end
+
+
+
+function shift_basis_td!(
+    es::AbstractVector,
+    H::UnivariateInnerFunction,
+    n::Integer,
+    t::Real,
+)
+    A0, B0, _, _ = ssparams(ssrealize(H))
+    T = eltype(t)
+    A =
+        kron((tril(ones(T, n + 1, n + 1)) - one(T) * I(n + 1)), A0 + A0') +
+        kron(diagm(ones(T, n + 1)), A0)
+    B = kron(ones(T, n + 1), B0)
+    mul!(es, exp(A * t), view(B, :, 1))
+end
+
+function shift_basis_td(H::UnivariateInnerFunction, n::Integer, t::Real)
+    es = zeros(typeof(t), (n + 1) * nstates(H))
+    shift_basis_td!(es, H, n, t)
+    return es
+end
+
+
+function shift_basis_td!(
+    es::AbstractMatrix,
+    H::UnivariateInnerFunction,
+    n::Integer,
+    t::AbstractVector{T},
+) where {T<:Real}
+    for (i, col) in enumerate(eachcol(es))
+        shift_basis_td!(col, H, n, t[i])
+    end
+end
+
+function shift_basis_td(
+    H::UnivariateInnerFunction,
+    n::Integer,
+    t::AbstractVector{T},
+) where {T<:Real}
+    ncol = length(t)
+    nrow = (n + 1) * nstates(H)
+    es = zeros(T, nrow, ncol)
+    shift_basis_td!(es, H, n, t)
+    return permutedims(es)
 end

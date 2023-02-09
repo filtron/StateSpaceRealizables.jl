@@ -38,6 +38,8 @@ export AbstractInnerFunction,
     CompositeKautzInner,
     butter_inner,
     shift_basis!,
-    shift_basis
+    shift_basis,
+    shift_basis_td!,
+    shift_basis_td
 
 end
