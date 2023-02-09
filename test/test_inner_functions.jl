@@ -2,9 +2,12 @@ function test_inner_functions()
 
     abstol = 1e-12
 
+    n = 2
+
     k = 101
     b = 5.0
     imaxis = im * collect(LinRange(-b, b, k))
+    ts = collect(LinRange(0.0, b, k))
 
     λs = [1.0, 2.0, 3.0]
     Ls = LaguerreInner.(λs)
@@ -35,6 +38,8 @@ function test_inner_functions()
                 @test B ≈ -C' atol = abstol
                 @test D * D' ≈ diagm(one.(diag(D)))
                 @test all(abs2.(L.(imaxis)) .≈ 1.0)
+                @test_nowarn shift_basis(L, n, imaxis)
+                @test_nowarn shift_basis_td(L, n, ts)
             end
 
         end
@@ -53,6 +58,8 @@ function test_inner_functions()
                 @test B ≈ -C' atol = abstol
                 @test D * D' ≈ diagm(one.(diag(D)))
                 @test all(abs2.(K.(imaxis)) .≈ 1.0)
+                @test_nowarn shift_basis(K, n, imaxis)
+                @test_nowarn shift_basis_td(K, n, ts)
             end
 
         end
@@ -71,6 +78,8 @@ function test_inner_functions()
                 @test B ≈ -C' atol = abstol
                 @test D * D' ≈ diagm(one.(diag(D)))
                 @test all(abs2.(P.(imaxis)) .≈ 1.0)
+                @test_nowarn shift_basis(P, n, imaxis)
+                @test_nowarn shift_basis_td(P, n, ts)
             end
 
             @test all(ssparams(P1) .≈ ssparams(reduce(*, Ls) * reduce(*, Ks)))
