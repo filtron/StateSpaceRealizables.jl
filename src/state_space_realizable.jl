@@ -368,38 +368,3 @@ function _impulse_response(s::AbstractStateSpace, ::MatrixParameter, ts)
     impulse_response!(hs, s, ts)
     return hs
 end
-
-
-
-#=
-function impulse_response!(hs::AbstractVector{<:AbstractMatrix}, s::MStateSpace, ts)
-    A, B, C, D = ssparams(s)
-    E = similar(B)
-    for (i, t) in enumerate(ts)
-        mul!(E, LinearAlgebra.exp!(A * t), B)
-        mul!(hs[i], C, E)
-        hs[i] .= hs[i] + D
-    end
-end
-=#
-
-#=
-function impulse_response!(hs::AbstractVector{<:AbstractMatrix}, s::MProperStateSpace, ts)
-    A, B, C, D = ssparams(s)
-    E = similar(B)
-    for (i, t) in enumerate(ts)
-        mul!(E, LinearAlgebra.exp!(A * t), B)
-        mul!(hs[i], C, E)
-    end
-end
-=#
-
-#=
-function impulse_response(s::S, ts) where {S<:Union{MStateSpace,MProperStateSpace}}
-    n = length(zs)
-    m = noutputs(s)
-    hs = [zeros(eltype(ts), m, m) for i = 1:n]
-    impulse_response!(hs, s, ts)
-    return hs
-end
-=#

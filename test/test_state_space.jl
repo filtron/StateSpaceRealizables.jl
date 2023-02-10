@@ -35,6 +35,8 @@ function test_state_space()
 
             S13 = S1 + S3
 
+            S4 = ProperStateSpace{E}(A3, B3, C3)
+
 
             @test ninputs(S1) == 2
             @test noutputs(S1) == 1
@@ -43,6 +45,15 @@ function test_state_space()
             @test all(ssparams(S2) .== (A2, B2, C2, nothing))
             @test ssrealize(S1) == S1
             @test ssrealize(S2) == S2
+            @test ssrealize(A1, B1, C1, D1; te = E()) == S1
+            @test isproper(S1) == iszero(D1)
+            @test isproper(S2) == true
+
+            @test_nowarn poles(S1)
+            @test_nowarn S3 + S4
+            @test_nowarn S4 + S3
+            @test_nowarn S3 - S4
+            @test_nowarn S4 - S3
 
             @test negS1.A == A1
             @test negS1.B == B1

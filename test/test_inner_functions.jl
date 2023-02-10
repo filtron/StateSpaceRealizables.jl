@@ -26,7 +26,7 @@ function test_inner_functions()
 
         @testset "LaguerreInner" begin
 
-            for L in Ls
+            for (i, L) in enumerate(Ls)
                 ninputs(L) == 1
                 noutputs(L) == 1
                 isproper(L) == false
@@ -38,6 +38,7 @@ function test_inner_functions()
                 @test B ≈ -C' atol = abstol
                 @test D * D' ≈ diagm(one.(diag(D)))
                 @test all(abs2.(L.(imaxis)) .≈ 1.0)
+                @test poles(L) == [-λs[i]]
                 @test_nowarn shift_basis(L, n, imaxis)
                 @test_nowarn shift_basis_td(L, n, ts)
             end
@@ -78,13 +79,25 @@ function test_inner_functions()
                 @test B ≈ -C' atol = abstol
                 @test D * D' ≈ diagm(one.(diag(D)))
                 @test all(abs2.(P.(imaxis)) .≈ 1.0)
+                @test_nowarn poles(P)
                 @test_nowarn shift_basis(P, n, imaxis)
                 @test_nowarn shift_basis_td(P, n, ts)
+
+                for C in Ps
+                    @test_nowarn P ∘ C
+                    @test_nowarn C ∘ P
+                end
             end
+
 
             @test all(ssparams(P1) .≈ ssparams(reduce(*, Ls) * reduce(*, Ks)))
             @test all(ssparams(P2) .≈ ssparams(reduce(*, Ls)))
             @test all(ssparams(P3) .≈ ssparams(reduce(*, Ks)))
+
+            @test CompositeInner(Ls[1], Ks[1]) == CompositeInner(Ls[1:1], Ks[1:1])
+            @test_nowarn butter_inner(1.0, 1)
+            @test_nowarn shift_basis(P3, n, imaxis[1])
+            @test_nowarn shift_basis_td(P3, n, ts[1])
 
         end
 
