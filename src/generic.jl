@@ -16,3 +16,21 @@ for func in (:(==), :isequal, :isapprox),
         return true
     end
 end
+
+
+function sqr_magnitude_response(h::StateSpaceRealizable, zs)
+    n = length(zs)
+    m = ninputs(h)
+    mag2 = [zeros(eltype(zs), m, m) for i = 1:n]
+    sqr_magnitude_response!(mag2, h, zs)
+    return mag2
+end
+
+function impulse_response(h::StateSpaceRealizable, ts)
+    n = length(ts)
+    hs = [zeros(eltype(ts), noutputs(h), ninputs(h)) for i = 1:n]
+    sqr_magnitude_response!(hs, h, ts)
+    return hs
+end
+
+

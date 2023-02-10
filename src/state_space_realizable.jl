@@ -8,7 +8,6 @@ abstract type StateSpaceRealizable{E<:TimeEvolution} end
 
 time_evolution(::StateSpaceRealizable{E}) where {E} = E
 
-# add an abstract linear StateSpace type ?
 # also add Realization as a type parameter.
 
 """

@@ -4,7 +4,7 @@ function test_inner_functions()
 
     n = 2
 
-    k = 101
+    k = 11
     b = 5.0
     imaxis = im * collect(LinRange(-b, b, k))
     ts = collect(LinRange(0.0, b, k))

@@ -1,6 +1,6 @@
 module StateSpaceRealizables
 
-using LinearAlgebra, ArrayInterface
+using LinearAlgebra, ArrayInterface,  SpecialFunctions
 
 import Base: ∘, *, +, -, ^, getproperty, eltype, length, size, ==, isequal, isapprox
 
@@ -27,6 +27,11 @@ export StateSpaceRealizable,
     sqr_magnitude_response!,
     impulse_response,
     impulse_response!
+
+include("generic.jl")
+
+include("siso/exp_smooth.jl")
+export ExpSmoother
 
 include("inner_functions.jl")
 export AbstractInnerFunction,
