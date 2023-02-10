@@ -35,9 +35,6 @@ function ssparams(h::ExpSmoother{<:ContinuousTE,T}) where {T}
     return A, B, permutedims(C)
 end
 
-
-ssrealize(h::ExpSmoother{E}) where {E} = Base.splat(ProperStateSpace{E})(ssparams(h))
-
 function sqr_magnitude_response!(mag2::AbstractVector{<:AbstractMatrix}, h::ExpSmoother{<:ContinuousTE,T}, zs) where {T}
     for (i, z) in enumerate(zs)
         mag2[i][1,1] = exp( T(2) * logfactorial(h.ν) - logfactorial(2 * h.ν)  + (T(2) * h.ν + one(T)) * log(2 * h.λ)) / (abs2(z) +  h.λ^2)^(h.ν + 1)
