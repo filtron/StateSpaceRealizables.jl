@@ -20,7 +20,8 @@ end
 
 
 # think I need a IsProper / IsNotProper trait here
-ssrealize(h::StateSpaceRealizable{E}) where {E} = Base.splat(ProperStateSpace{E})(ssparams(h))
+ssrealize(h::StateSpaceRealizable{E}) where {E} = Base.splat(ProperStateSpace{E})(ssparams(h)) 
+
 
 function sqr_magnitude_response(h::StateSpaceRealizable, zs)
     n = length(zs)

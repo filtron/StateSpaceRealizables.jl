@@ -31,7 +31,8 @@ export StateSpaceRealizable,
 include("generic.jl")
 
 include("siso/exp_smooth.jl")
-export ExpSmoother
+include("siso/oscillator.jl")
+export ExpSmoother, Oscillator 
 
 include("inner_functions.jl")
 export AbstractInnerFunction,
