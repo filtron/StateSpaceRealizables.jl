@@ -14,7 +14,6 @@ include("state_space_realizable.jl")
 export StateSpaceRealizable,
     time_evolution,
     AbstractStateSpace,
-    StateSpace,
     ProperStateSpace,
     ninputs,
     nstates,
@@ -27,6 +26,11 @@ export StateSpaceRealizable,
     sqr_magnitude_response!,
     impulse_response,
     impulse_response!
+
+include("state_space/state_space.jl")
+include("state_space/proper_state_space.jl")
+include("state_space/ss_algebra.jl")
+export StateSpace, ProperStateSpace
 
 include("generic.jl")
 
