@@ -5,7 +5,7 @@ Abstract type for representing inner functions.
 """
 abstract type AbstractInnerFunction{E} <: StateSpaceRealizable{E} end
 
-isproper(::AbstractInnerFunction) = false
+isproper(::AbstractInnerFunction) = IsNotProper()
 
 """
     AbstractInnerFunction{E<:TimeEvolution}
@@ -174,7 +174,7 @@ ssparams(H::CompositeInner) = ssparams(ssrealize(H))
 
 Computes the balanced state-space realization of the inner function H.
 """
-ssrealize(H::AbstractInnerFunction) = StateSpace{time_evolution(H)}(ssparams(H)...)
+#ssrealize(H::AbstractInnerFunction) = StateSpace{time_evolution(H)}(ssparams(H)...)
 ssrealize(C::CompositeLaguerreInner) = reduce(∘, ssrealize.(C.laguerre_inners)) # can be made more efficient by pre-allocation and for loop?
 ssrealize(C::CompositeKautzInner) = reduce(∘, ssrealize.(C.kautz_inners)) # can be made more efficient by pre-allocation and for loop?
 ssrealize(C::CompositeInner) =

@@ -29,7 +29,7 @@ function test_state_space()
             S2 = ProperStateSpace{E}(A2, B2, C2)
             negS2 = -S2
 
-            S12 = S1 * S2
+            S12 = S1 ∘ S2
 
             S3 = StateSpace{E}(A3, B3, C3, D3)
 
@@ -46,8 +46,8 @@ function test_state_space()
             @test ssrealize(S1) == S1
             @test ssrealize(S2) == S2
             @test ssrealize(A1, B1, C1, D1; te = E()) == S1
-            @test isproper(S1) == iszero(D1)
-            @test isproper(S2) == true
+            @test isproper(S1) == IsNotProper()
+            @test isproper(S2) == IsProper()
 
             @test_nowarn poles(S1)
             @test_nowarn S3 + S4

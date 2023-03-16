@@ -49,9 +49,14 @@ function StateSpace{E}(
     return StateSpace{E,T}(A, B, C, D)
 end
 
-ssparameter_type(
-    ::StateSpace{ET,T,<:AbstractMatrix,<:AbstractMatrix,<:AbstractMatrix,<:AbstractMatrix},
-) where {ET,T} = MatrixParameter()
+
+const MatrixStateSpace{ET,T,TA,TB,TC,TD} = StateSpace{ET,T,TA,TB,TC,TD} where {ET,T,TA<:AbstractMatrix,TB<:AbstractMatrix,TC<:AbstractMatrix,TD<:AbstractMatrix}
+
+ninputs(s::MatrixStateSpace) = size(s.B, 2)
+nstates(s::MatrixStateSpace) = size(s.A, 1)
+noutputs(s::MatrixStateSpace) = size(s.C, 1)
+
+isproper(::StateSpace) = IsNotProper()
 
 
 
@@ -61,14 +66,17 @@ ssrealize(s::StateSpace) = s
 ssrealize(A, B, C, D; te::TimeEvolution = ContinuousTE()) =
     StateSpace{typeof(te)}(A, B, C, D)
 
-ssnegate(s::StateSpace{E}, ::MatrixParameter) where {E} =
+
+poles(s::MatrixStateSpace) =  complex.(eigvals(s.A))
+
+-(s::MatrixStateSpace{E}) where {E} =
     StateSpace{E}(s.A, s.B, -s.C, -s.D)
 
 
-function _sqr_magnitude_response!(
+
+function sqr_magnitude_response!(
         mag2::AbstractVector{<:AbstractMatrix},
-        s::StateSpace{<:ContinuousTE},
-        ::MatrixParameter,
+        s::MatrixStateSpace{<:ContinuousTE},
         zs,
     )
         A, B, C, D = ssparams(s)
@@ -83,10 +91,9 @@ function _sqr_magnitude_response!(
 end
 
 
-function _impulse_response!(
+function impulse_response!(
     hs::AbstractVector{<:AbstractMatrix},
-    s::StateSpace{<:ContinuousTE},
-    ::MatrixParameter,
+    s::MatrixStateSpace{<:ContinuousTE},
     ts,
 )
     A, B, C, D = ssparams(s)

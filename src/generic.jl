@@ -19,9 +19,11 @@ end
 
 
 
-# think I need a IsProper / IsNotProper trait here
-ssrealize(h::StateSpaceRealizable{E}) where {E} = Base.splat(ProperStateSpace{E})(ssparams(h)) 
 
+# think I need a IsProper / IsNotProper trait here
+ssrealize(h::StateSpaceRealizable) = ssrealize(isproper(h), h)
+ssrealize(::IsNotProper, h::StateSpaceRealizable{E}) where {E} = Base.splat(StateSpace{E})(ssparams(h))
+ssrealize(::IsProper, h::StateSpaceRealizable{E}) where {E} = Base.splat(ProperStateSpace{E})(ssparams(h))
 
 function sqr_magnitude_response(h::StateSpaceRealizable, zs)
     n = length(zs)
@@ -34,7 +36,7 @@ end
 function impulse_response(h::StateSpaceRealizable, ts)
     n = length(ts)
     hs = [zeros(eltype(ts), noutputs(h), ninputs(h)) for i = 1:n]
-    sqr_magnitude_response!(hs, h, ts)
+    impulse_response!(hs, h, ts)
     return hs
 end
 
