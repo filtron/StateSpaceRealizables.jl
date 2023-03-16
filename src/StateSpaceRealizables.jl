@@ -12,9 +12,12 @@ export RealizationMethod, AnyRealization, Balanced, InternallyBalanced
 
 include("state_space_realizable.jl")
 export StateSpaceRealizable,
+    LTIStateSpaceRealizable,
+    IsProper,
+    IsNotProper,
+    isproper,
     time_evolution,
     AbstractStateSpace,
-    StateSpace,
     ProperStateSpace,
     ninputs,
     nstates,
@@ -27,6 +30,11 @@ export StateSpaceRealizable,
     sqr_magnitude_response!,
     impulse_response,
     impulse_response!
+
+include("state_space/state_space.jl")
+include("state_space/proper_state_space.jl")
+include("state_space/state_space_algebra.jl")
+export StateSpace, ProperStateSpace
 
 include("generic.jl")
 
@@ -44,5 +52,8 @@ export AbstractInnerFunction,
     shift_basis,
     shift_basis_td!,
     shift_basis_td
+
+include("realizables/exponential_smoother.jl")
+export ExpSmoother
 
 end
